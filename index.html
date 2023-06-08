@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- PWA 매니페스트 파일 연결, 상태바 테마색상을 흰색으로 변경 -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" color="#FFFFFF">
+    <!-- 뷰포트 파비콘 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./images/icons/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>PWA by JS</title>
+</head>
+<style>
+    html,
+    body {
+        height: 100%;
+        /* html,body 높이 100%고정 */
+        background-color: #2d86af;
+        color: #FFFFFF;
+    }
+
+    .container {
+        height: 100%;
+        /* 높이를 100% 고정 */
+        display: flex;
+        /* 컨테이너를 flexbox로 고정 */
+        justify-content: center;
+        /* 가운데 정렬 */
+        align-items: center;
+        /* 중간 정렬 */
+    }
+</style>
+<!-- 서비스 워커 등록 -->
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('./service-worker.js')
+            .then(function () {
+                console.log('서비스 워커가 등록됨!')
+            })
+    }
+</script>
+
+<body>
+    <div class="container">
+        <h1>Hello, PWA!</h1>
+        <img src="./images/icons/android-chrome-192x192.png">
+        <p style="font-weight: bold;">by Javascript</p>
+    </div>
+    <!-- 인덱스 -->
+    <!-- <button type="button" id="btn">CLICK</button> -->
+</body>
+
+<!-- <script>
+    /* 서비스워커 생애주기 (Lifecycle) */
+    /* self = window */        /* function(pEvent){} 랑 같음*/
+    /* self.addEventListener("install", pEvent => {
+        console.log("데이터 요청(fetch!", pEvent.request) /* request */
+    /* console.log("서비스 워커 설치 완료!")
+})
+let btn = document.getElementById("btn");
+btn.addEventListener("click", (e) => {
+    console.log(e.type);
+})
+ */
+
+    const sCacheName = "hello`pwa"; //캐시제목
+    const aFilesToCache = [// 캐시할 파일 지정
+        './',
+        './index.html',
+        './manifest.json',
+        './images/icons/android-chrome-192x192.png'
+    ];
+
+    //서비스워커 실행 & 캐시파일 저장
+    self.addEventListener("install", pEvent => {
+        pEvent.waitUntil(
+            caches.open(sCacheName) //자동으로 만들어준다  open() > 파일을 연 다음
+                .then(pCache => {
+                    return pCache.addAll(aFilesToCache);
+                })
+        );
+    });
+
+    //고유 번호 할당받은 서비스워커 동작 시작
+    self.addEventListener('activate', pEvent => {
+        console.log('서비스워커 동작 시작됨!')
+    })
+
+    //고유 번호 할당받은 서비스워커 작동
+    self.addEventListener('fetch', pEvent => {
+        pEvent.respondWith(
+            caches.match(pEvent.request)
+                .then(response => {
+                    if (!response) {
+                        console.log("네트워크로 데이터 요청!", pEvent.request)
+                        return fetch(pEvent.request)
+                    }
+                    console.log("캐시에서 데이터 요청!", pEvent.request)
+                    return response;
+                }).catch(err => console.log(err))
+        )
+    })
+</script> -->
+
+</html>
